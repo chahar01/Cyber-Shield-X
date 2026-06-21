@@ -1,0 +1,32 @@
+<aside class="app-sidebar">
+    <a href="/" class="app-brand">
+        <i class="fa-solid fa-shield-halved"></i>
+        CyberShield X
+    </a>
+
+    <nav class="app-nav" aria-label="Main navigation">
+        <a href="/" class="{% if request.path == '/' %}active{% endif %}"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+        <a href="/log" class="{% if request.path.startswith('/log') %}active{% endif %}"><i class="fa-solid fa-file-shield"></i> Log Analysis</a>
+        <a href="/recon" class="{% if request.path.startswith('/recon') %}active{% endif %}"><i class="fa-solid fa-network-wired"></i> Network Recon</a>
+        <a href="/packet" class="{% if request.path.startswith('/packet') or request.path.startswith('/live_packet') %}active{% endif %}"><i class="fa-solid fa-diagram-project"></i> Packet Inspection</a>
+        <a href="/threat" class="{% if request.path.startswith('/threat') %}active{% endif %}"><i class="fa-solid fa-globe"></i> Threat Intel</a>
+        <a href="/reports" class="{% if request.path.startswith('/reports') %}active{% endif %}"><i class="fa-solid fa-folder-open"></i> Reports</a>
+        <a href="/profile" class="{% if request.path.startswith('/profile') %}active{% endif %}"><i class="fa-solid fa-id-card"></i> Profile</a>
+        <a href="/help" class="{% if request.path.startswith('/help') %}active{% endif %}"><i class="fa-solid fa-circle-question"></i> Help</a>
+        {% if session.is_admin or session.role in ["admin", "super_admin"] %}
+        <a href="/admin" class="{% if request.path.startswith('/admin') %}active{% endif %}"><i class="fa-solid fa-user-shield"></i> Admin Panel</a>
+        {% endif %}
+        <a href="/logout" class="danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </nav>
+
+    {% if session.user %}
+    <div class="app-account">
+        <strong>{{ session.account_name or session.user }}</strong>
+        <span>@{{ session.user }}</span>
+        <a href="/theme/{{ 'light' if session.theme != 'light' else 'dark' }}" class="theme-toggle">
+            <i class="fa-solid fa-circle-half-stroke"></i>
+            {{ 'Light mode' if session.theme != 'light' else 'Dark mode' }}
+        </a>
+    </div>
+    {% endif %}
+</aside>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='app-shell.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>Compare Reports</title>
+    <style>
+        *{box-sizing:border-box;font-family:Arial,sans-serif;margin:0;padding:0;}
+        body{min-height:100vh;background:linear-gradient(135deg,#0f172a,#111827,#1e293b);color:white;padding:30px;}
+        .container{max-width:1000px;margin:auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:28px;}
+        h1{color:#38bdf8;margin-bottom:18px;}
+        form{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;margin-bottom:18px;}
+        input,button{min-height:42px;border:0;border-radius:8px;padding:10px 12px;}
+        button{background:#38bdf8;color:#0f172a;font-weight:700;cursor:pointer;}
+        .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+        .box{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:16px;}
+        .box h2{font-size:18px;color:#7dd3fc;margin-bottom:10px;}
+        .badge{display:inline-flex;padding:7px 10px;border-radius:999px;background:rgba(56,189,248,0.14);color:#7dd3fc;margin:4px;font-weight:700;font-size:12px;}
+        @media(max-width:800px){body{padding:18px}form,.grid{grid-template-columns:1fr;}}
+    </style>
+</head>
+<body class="app-main theme-{{ session.theme or 'dark' }}">
+{% include "_sidebar.html" %}
+<div class="container">
+    <h1><i class="fa-solid fa-code-compare"></i> Compare Reports</h1>
+    <form method="GET">
+        <input type="number" name="first" value="{{ first.id if first else '' }}" placeholder="First report ID" required>
+        <input type="number" name="second" value="{{ second.id if second else '' }}" placeholder="Second report ID" required>
+        <button type="submit">Compare</button>
+    </form>
+
+    {% if comparison %}
+    <div class="grid">
+        <div class="box">
+            <h2>Report #{{ first.id }}</h2>
+            <p>{{ first.tool }} | {{ first.target or "-" }}</p>
+            <p>{{ first.created_at }}</p>
+        </div>
+        <div class="box">
+            <h2>Report #{{ second.id }}</h2>
+            <p>{{ second.tool }} | {{ second.target or "-" }}</p>
+            <p>{{ second.created_at }}</p>
+        </div>
+    </div>
+    <div class="box" style="margin-top:16px;">
+        <h2>Comparison</h2>
+        <p>Same tool: {{ "Yes" if comparison.same_tool else "No" }}</p>
+        <p>Same target: {{ "Yes" if comparison.same_target else "No" }}</p>
+        <p>Added keys: {% for item in comparison.added_keys %}<span class="badge">{{ item }}</span>{% else %}-{% endfor %}</p>
+        <p>Removed keys: {% for item in comparison.removed_keys %}<span class="badge">{{ item }}</span>{% else %}-{% endfor %}</p>
+        <p>Shared keys: {% for item in comparison.shared_keys %}<span class="badge">{{ item }}</span>{% else %}-{% endfor %}</p>
+    </div>
+    {% endif %}
+</div>
+</body>
+</html>

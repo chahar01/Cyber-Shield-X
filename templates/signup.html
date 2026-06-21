@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CyberShield">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='pwa/icon.svg') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='pwa/maskable-icon.svg') }}">
+    <title>Cyber Dashboard Signup</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Poppins',sans-serif;
+        }
+
+        body{
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background:#020617;
+            overflow:hidden;
+            position:relative;
+        }
+
+        /* Live Cyber Wallpaper */
+
+        body::before{
+            content:'';
+            position:absolute;
+            inset:-80px;
+            background:
+                radial-gradient(circle at 72% 43%, rgba(168,85,247,0.22), transparent 26%),
+                radial-gradient(circle at 78% 48%, rgba(34,211,238,0.18), transparent 18%),
+                radial-gradient(circle at 24% 52%, rgba(14,165,233,0.14), transparent 22%),
+                linear-gradient(135deg,#02030a,#080617 46%,#140b23);
+            animation: glowShift 15s ease-in-out infinite alternate;
+        }
+
+        body::after{
+            content:'';
+            position:absolute;
+            inset:0;
+            background:
+                radial-gradient(circle, rgba(255,255,255,0.42) 1px, transparent 2px),
+                radial-gradient(circle, rgba(34,211,238,0.34) 1px, transparent 2px),
+                linear-gradient(110deg, transparent 0 42%, rgba(34,211,238,0.10) 49%, transparent 56% 100%);
+            background-size:62px 62px, 120px 120px, 240% 100%;
+            opacity:0.34;
+            animation:nodeDrift 24s linear infinite, scanSweep 8s linear infinite;
+        }
+
+        .live-wallpaper{
+            position:absolute;
+            inset:0;
+            overflow:hidden;
+            z-index:0;
+            pointer-events:none;
+        }
+
+        .particle{
+            position:absolute;
+            width:3px;
+            height:3px;
+            border-radius:50%;
+            background:#d8b4fe;
+            box-shadow:0 0 18px rgba(34,211,238,0.95);
+            opacity:0.58;
+            animation:floatData 13s linear infinite;
+        }
+
+        .circuit-lines{
+            position:absolute;
+            inset:0;
+            opacity:0.92;
+        }
+
+        .circuit-lines::before,
+        .circuit-lines::after{
+            content:'';
+            position:absolute;
+            left:-8%;
+            right:-8%;
+            height:110px;
+            background:
+                linear-gradient(90deg, transparent 0 6%, rgba(34,211,238,0.75) 6% 24%, transparent 24% 28%, rgba(34,211,238,0.52) 28% 42%, transparent 42%),
+                repeating-linear-gradient(135deg, rgba(34,211,238,0.40) 0 2px, transparent 2px 9px);
+            mask-image:linear-gradient(180deg, transparent, #000 28%, #000 70%, transparent);
+            animation:circuitFlow 7s linear infinite;
+        }
+
+        .circuit-lines::before{
+            top:33%;
+        }
+
+        .circuit-lines::after{
+            top:47%;
+            transform:scaleX(-1);
+            opacity:0.55;
+            animation-duration:9s;
+        }
+
+        .cyber-shield{
+            position:absolute;
+            width:170px;
+            height:200px;
+            right:18%;
+            top:28%;
+            clip-path:polygon(50% 0, 90% 17%, 82% 73%, 50% 100%, 18% 73%, 10% 17%);
+            background:
+                linear-gradient(135deg, rgba(34,211,238,0.22), rgba(168,85,247,0.20)),
+                repeating-linear-gradient(90deg, transparent 0 18px, rgba(34,211,238,0.22) 18px 20px),
+                repeating-linear-gradient(0deg, transparent 0 18px, rgba(34,211,238,0.18) 18px 20px);
+            border:1px solid rgba(125,211,252,0.8);
+            box-shadow:0 0 34px rgba(34,211,238,0.28), inset 0 0 28px rgba(168,85,247,0.22);
+            opacity:0.55;
+            animation:shieldPulse 4.5s ease-in-out infinite;
+        }
+
+        .cyber-shield::before{
+            content:'';
+            position:absolute;
+            width:34px;
+            height:34px;
+            border-radius:50%;
+            background:#020617;
+            border:2px solid rgba(34,211,238,0.72);
+            top:28%;
+            left:50%;
+            transform:translateX(-50%);
+            box-shadow:0 0 18px rgba(34,211,238,0.45);
+        }
+
+        .cyber-shield::after{
+            content:'';
+            position:absolute;
+            width:14px;
+            height:58px;
+            border-radius:10px;
+            background:#020617;
+            border:2px solid rgba(34,211,238,0.58);
+            top:44%;
+            left:50%;
+            transform:translateX(-50%);
+        }
+
+        .particle:nth-child(1){ left:8%; animation-delay:0s; animation-duration:10s; }
+        .particle:nth-child(2){ left:18%; animation-delay:2s; animation-duration:12s; }
+        .particle:nth-child(3){ left:31%; animation-delay:1s; animation-duration:9s; }
+        .particle:nth-child(4){ left:45%; animation-delay:4s; animation-duration:11s; }
+        .particle:nth-child(5){ left:58%; animation-delay:1.5s; animation-duration:10s; }
+        .particle:nth-child(6){ left:71%; animation-delay:3s; animation-duration:13s; }
+        .particle:nth-child(7){ left:84%; animation-delay:0.5s; animation-duration:9s; }
+        .particle:nth-child(8){ left:94%; animation-delay:5s; animation-duration:12s; }
+
+        @keyframes glowShift{
+            from{ transform:scale(1) translate3d(0,0,0); filter:hue-rotate(0deg) blur(0); }
+            to{ transform:scale(1.06) translate3d(-22px,16px,0); filter:hue-rotate(14deg) blur(2px); }
+        }
+
+        @keyframes nodeDrift{
+            from{ background-position:0 0,180% 0; }
+            to{ background-position:58px -58px,-80% 0; }
+        }
+
+        @keyframes scanSweep{
+            from{ background-position:0 0,180% 0; }
+            to{ background-position:58px -58px,-80% 0; }
+        }
+
+        @keyframes floatData{
+            0%{ transform:translateY(110vh) scale(0.7); opacity:0; }
+            12%{ opacity:0.85; }
+            100%{ transform:translateY(-12vh) scale(1.25); opacity:0; }
+        }
+
+        @keyframes circuitFlow{
+            from{ background-position:0 0,0 0; }
+            to{ background-position:180px 0,120px 0; }
+        }
+
+        @keyframes shieldPulse{
+            0%,100%{ transform:translateY(0) scale(1); opacity:0.48; }
+            50%{ transform:translateY(-8px) scale(1.03); opacity:0.68; }
+        }
+
+        /* Signup Card */
+
+        .signup-box{
+            position:relative;
+            width:420px;
+            background:rgba(255,255,255,0.05);
+            backdrop-filter:blur(12px);
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:25px;
+            padding:40px;
+            text-align:center;
+            box-shadow:0 0 35px rgba(0,0,0,0.45);
+            z-index:1;
+        }
+
+        .signup-box h1{
+            color:#38bdf8;
+            font-size:34px;
+            margin-bottom:8px;
+        }
+
+        .signup-box h2{
+            color:#cbd5e1;
+            font-size:15px;
+            font-weight:400;
+            margin-bottom:30px;
+        }
+
+        /* Input Group */
+
+        .input-group{
+            position:relative;
+            margin-bottom:20px;
+        }
+
+        .input-group i{
+            position:absolute;
+            left:15px;
+            top:50%;
+            transform:translateY(-50%);
+            color:#94a3b8;
+        }
+
+        .input-group input{
+            width:100%;
+            padding:14px 45px;
+            border:none;
+            border-radius:14px;
+            background:rgba(255,255,255,0.08);
+            color:white;
+            outline:none;
+            font-size:15px;
+        }
+
+        .input-group input::placeholder{
+            color:#cbd5e1;
+        }
+
+        /* Password Toggle */
+
+        .toggle-password{
+            position:absolute;
+            right:15px;
+            top:50%;
+            transform:translateY(-50%);
+            cursor:pointer;
+            color:#94a3b8;
+        }
+
+        /* Password Strength */
+
+        .strength{
+            text-align:left;
+            margin-top:-10px;
+            margin-bottom:15px;
+            font-size:14px;
+            font-weight:600;
+        }
+
+        /* Button */
+
+        .signup-btn{
+            width:100%;
+            padding:14px;
+            border:none;
+            border-radius:14px;
+            background:#38bdf8;
+            color:#0f172a;
+            font-size:16px;
+            font-weight:600;
+            cursor:pointer;
+            transition:0.3s;
+        }
+
+        .signup-btn:hover{
+            background:#0ea5e9;
+            transform:scale(1.03);
+        }
+
+        /* Links */
+
+        .links{
+            margin-top:22px;
+        }
+
+        .alert{
+            padding:12px 14px;
+            border-radius:12px;
+            margin-bottom:18px;
+            color:#fecaca;
+            background:rgba(239,68,68,0.12);
+            border:1px solid rgba(239,68,68,0.25);
+            font-size:13px;
+            text-align:left;
+        }
+
+        .links a{
+            color:#cbd5e1;
+            text-decoration:none;
+            font-size:14px;
+            transition:0.3s;
+        }
+
+        .links a:hover{
+            color:#38bdf8;
+        }
+
+        @media(max-width:500px){
+
+            .signup-box{
+                width:90%;
+                padding:30px 20px;
+            }
+
+            .signup-box h1{
+                font-size:28px;
+            }
+
+        }
+
+    </style>
+
+    <script>
+
+        /* Password Strength */
+
+        function checkPassword(){
+
+            let pass =
+            document.getElementById("password").value;
+
+            let strength = 0;
+
+            if(pass.match(/[a-z]/)) strength++;
+
+            if(pass.match(/[A-Z]/)) strength++;
+
+            if(pass.match(/[0-9]/)) strength++;
+
+            if(pass.match(/[^a-zA-Z0-9]/)) strength++;
+
+            let text =
+            document.getElementById("strength");
+
+            if(pass.length === 0){
+
+                text.innerHTML = "";
+
+            }
+
+            else if(strength <= 2){
+
+                text.innerHTML = "Weak Password";
+
+                text.style.color = "#ef4444";
+
+            }
+
+            else if(strength == 3){
+
+                text.innerHTML = "Moderate Password";
+
+                text.style.color = "#f59e0b";
+
+            }
+
+            else{
+
+                text.innerHTML = "Strong Password";
+
+                text.style.color = "#22c55e";
+
+            }
+
+        }
+
+        /* Show / Hide Password */
+
+        function togglePassword(){
+
+            const password =
+            document.getElementById("password");
+
+            const eyeIcon =
+            document.getElementById("eyeIcon");
+
+            if(password.type === "password"){
+
+                password.type = "text";
+
+                eyeIcon.classList.remove("fa-eye");
+
+                eyeIcon.classList.add("fa-eye-slash");
+
+            }
+
+            else{
+
+                password.type = "password";
+
+                eyeIcon.classList.remove("fa-eye-slash");
+
+                eyeIcon.classList.add("fa-eye");
+
+            }
+
+        }
+
+    </script>
+
+</head>
+
+<body>
+
+<div class="live-wallpaper" aria-hidden="true">
+    <div class="circuit-lines"></div>
+    <div class="cyber-shield"></div>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+</div>
+
+<div class="signup-box">
+
+    <h1>
+        <i class="fa-solid fa-user-shield"></i>
+        Signup
+    </h1>
+
+    <h2>Create Your Cyber Dashboard Account</h2>
+
+    {% if error %}
+    <div class="alert">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <!-- Full Name -->
+
+        <div class="input-group">
+
+            <i class="fa-solid fa-user"></i>
+
+            <input type="text"
+                   name="name"
+                   placeholder="Full Name"
+                   required>
+
+        </div>
+
+        <!-- Username -->
+
+        <div class="input-group">
+
+            <i class="fa-solid fa-envelope"></i>
+
+            <input type="email"
+                   name="email"
+                   placeholder="Email Address">
+
+        </div>
+
+        <div class="input-group">
+
+            <i class="fa-solid fa-phone"></i>
+
+            <input type="text"
+                   name="phone"
+                   placeholder="Phone Number">
+
+        </div>
+
+        <div class="input-group">
+
+            <i class="fa-solid fa-building"></i>
+
+            <input type="text"
+                   name="department"
+                   placeholder="Department">
+
+        </div>
+
+        <div class="input-group">
+
+            <i class="fa-solid fa-id-badge"></i>
+
+            <input type="text"
+                   name="username"
+                   placeholder="Username"
+                   required>
+
+        </div>
+
+        <!-- Password -->
+
+        <div class="input-group">
+
+            <i class="fa-solid fa-lock"></i>
+
+            <input type="password"
+                   id="password"
+                   name="password"
+                   placeholder="Password"
+                   onkeyup="checkPassword()"
+                   required>
+
+            <span class="toggle-password"
+                  onclick="togglePassword()">
+
+                <i class="fa-solid fa-eye"
+                   id="eyeIcon"></i>
+
+            </span>
+
+        </div>
+
+        <!-- Password Strength -->
+
+        <p class="strength"
+           id="strength"></p>
+
+        <!-- Button -->
+
+        <button type="submit"
+                class="signup-btn">
+
+            <i class="fa-solid fa-user-plus"></i>
+            Create Account
+
+        </button>
+
+    </form>
+
+    <!-- Links -->
+
+    <div class="links">
+
+        <a href="/login">
+
+            Already have an account?
+            Login
+
+        </a>
+
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='pwa.js') }}"></script>
+</body>
+</html>

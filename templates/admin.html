@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CyberShield">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='pwa/icon.svg') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='pwa/maskable-icon.svg') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='app-shell.css') }}">
+    <title>Admin Control Center</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Poppins',sans-serif;
+        }
+
+        body{
+            min-height:100vh;
+            background:linear-gradient(135deg,#0f172a,#111827,#1e293b);
+            color:white;
+            padding:30px;
+        }
+
+        .container{
+            width:100%;
+            max-width:1250px;
+            margin:auto;
+            background:rgba(255,255,255,0.05);
+            backdrop-filter:blur(12px);
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:22px;
+            padding:35px;
+            box-shadow:0 0 35px rgba(0,0,0,0.45);
+        }
+
+        .topbar{
+            display:flex;
+            justify-content:space-between;
+            gap:18px;
+            align-items:flex-start;
+            margin-bottom:28px;
+        }
+
+        .title h1{
+            color:#38bdf8;
+            font-size:34px;
+            margin-bottom:8px;
+        }
+
+        .title p{
+            color:#cbd5e1;
+            font-size:14px;
+        }
+
+        .back-link{
+            min-height:42px;
+            padding:10px 16px;
+            border-radius:12px;
+            background:rgba(56,189,248,0.12);
+            color:#7dd3fc;
+            text-decoration:none;
+            display:inline-flex;
+            align-items:center;
+            gap:9px;
+            font-weight:600;
+            white-space:nowrap;
+        }
+
+        .stats{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+            gap:18px;
+            margin-bottom:28px;
+        }
+
+        .stat{
+            background:rgba(255,255,255,0.06);
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:8px;
+            padding:22px;
+        }
+
+        .stat i{
+            color:#38bdf8;
+            font-size:26px;
+            margin-bottom:12px;
+        }
+
+        .stat h2{
+            font-size:32px;
+            line-height:1;
+            margin-bottom:8px;
+        }
+
+        .stat p{
+            color:#cbd5e1;
+            font-size:13px;
+        }
+
+        .notice{
+            padding:13px 15px;
+            border-radius:12px;
+            margin-bottom:18px;
+            font-size:14px;
+        }
+
+        .success{
+            color:#dcfce7;
+            background:rgba(34,197,94,0.12);
+            border:1px solid rgba(34,197,94,0.28);
+        }
+
+        .error{
+            color:#fee2e2;
+            background:rgba(239,68,68,0.12);
+            border:1px solid rgba(239,68,68,0.28);
+        }
+
+        .section{
+            margin-top:28px;
+        }
+
+        .management-grid{
+            display:grid;
+            grid-template-columns:1fr;
+            gap:24px;
+        }
+
+        .management-box{
+            background:rgba(255,255,255,0.035);
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:8px;
+            padding:20px;
+        }
+
+        .management-box h3{
+            color:#e0f2fe;
+            font-size:18px;
+            margin-bottom:14px;
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+
+        .admin-form{
+            display:grid;
+            grid-template-columns:repeat(4,minmax(0,1fr));
+            gap:12px;
+            align-items:end;
+        }
+
+        .field label{
+            display:block;
+            color:#cbd5e1;
+            font-size:12px;
+            font-weight:600;
+            margin-bottom:7px;
+        }
+
+        .field input,
+        .field select,
+        .inline-select{
+            width:100%;
+            min-height:44px;
+            padding:11px 13px;
+            border:none;
+            border-radius:10px;
+            background:rgba(255,255,255,0.08);
+            color:white;
+            outline:none;
+        }
+
+        .field select,
+        .inline-select{
+            background:#f8fafc;
+            color:#0f172a;
+        }
+
+        .field select option,
+        .field select optgroup,
+        .inline-select option{
+            background:#ffffff;
+            color:#0f172a;
+        }
+
+        .field input::placeholder{
+            color:#94a3b8;
+        }
+
+        .inline-select{
+            min-width:130px;
+        }
+
+        .create-btn{
+            min-height:44px;
+            border:none;
+            border-radius:10px;
+            background:#22c55e;
+            color:white;
+            font-weight:700;
+            cursor:pointer;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:9px;
+        }
+
+        .promote-btn{
+            background:#22c55e;
+            color:white;
+        }
+
+        .block-btn{
+            background:#64748b;
+            color:white;
+        }
+
+        .unblock-btn{
+            background:#14b8a6;
+            color:white;
+        }
+
+        .status-blocked{
+            color:#fecaca;
+            background:rgba(239,68,68,0.14);
+        }
+
+        .filter-form{
+            display:grid;
+            grid-template-columns:repeat(4,minmax(0,1fr));
+            gap:12px;
+            margin-bottom:16px;
+        }
+
+        .task-filters{
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+            margin-bottom:16px;
+        }
+
+        .task-filter{
+            min-height:42px;
+            padding:10px 14px;
+            border-radius:10px;
+            background:#e0f2fe;
+            border:1px solid #38bdf8;
+            color:#0f172a;
+            text-decoration:none;
+            font-size:13px;
+            font-weight:700;
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+            box-shadow:0 0 0 1px rgba(15,23,42,0.08);
+        }
+
+        .task-filter:visited{
+            color:#0f172a;
+        }
+
+        .task-filter:hover,
+        .task-filter:focus-visible,
+        .task-filter.active{
+            background:#38bdf8;
+            border-color:#7dd3fc;
+            color:#0f172a;
+            outline:none;
+        }
+
+        .insight-grid{
+            display:grid;
+            grid-template-columns:1.2fr 1fr;
+            gap:18px;
+            margin-bottom:28px;
+        }
+
+        .insight-box{
+            background:rgba(255,255,255,0.045);
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:8px;
+            padding:18px;
+        }
+
+        .insight-box h3{
+            color:#e0f2fe;
+            font-size:17px;
+            margin-bottom:14px;
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+
+        .bar-row{
+            display:grid;
+            grid-template-columns:minmax(120px,1fr) minmax(120px,2fr) 44px;
+            gap:12px;
+            align-items:center;
+            margin-bottom:12px;
+            color:#cbd5e1;
+            font-size:13px;
+        }
+
+        .bar-track{
+            height:10px;
+            border-radius:999px;
+            background:rgba(148,163,184,0.18);
+            overflow:hidden;
+        }
+
+        .bar-fill{
+            height:100%;
+            border-radius:999px;
+            background:linear-gradient(90deg,#22c55e,#38bdf8);
+        }
+
+        .alert-list{
+            display:grid;
+            gap:10px;
+        }
+
+        .alert-item{
+            display:flex;
+            gap:11px;
+            align-items:flex-start;
+            padding:12px;
+            border-radius:8px;
+            background:rgba(245,158,11,0.1);
+            border:1px solid rgba(245,158,11,0.26);
+        }
+
+        .alert-item i{
+            color:#fbbf24;
+            margin-top:3px;
+        }
+
+        .alert-item strong{
+            display:block;
+            color:#fde68a;
+            font-size:13px;
+            margin-bottom:3px;
+        }
+
+        .alert-item span{
+            color:#e2e8f0;
+            font-size:13px;
+        }
+
+        .export-row{
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+            margin-bottom:16px;
+        }
+
+        .export-link{
+            min-height:40px;
+            padding:9px 13px;
+            border-radius:10px;
+            background:rgba(34,197,94,0.14);
+            border:1px solid rgba(34,197,94,0.34);
+            color:#bbf7d0;
+            text-decoration:none;
+            font-size:13px;
+            font-weight:700;
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+        }
+
+        .modal-backdrop{
+            position:fixed;
+            inset:0;
+            background:rgba(2,6,23,0.72);
+            display:none;
+            align-items:center;
+            justify-content:center;
+            z-index:100;
+            padding:20px;
+        }
+
+        .modal-backdrop.active{
+            display:flex;
+        }
+
+        .confirm-modal{
+            width:min(420px,100%);
+            background:#0f172a;
+            border:1px solid rgba(56,189,248,0.28);
+            border-radius:8px;
+            padding:22px;
+            box-shadow:0 20px 50px rgba(0,0,0,0.45);
+        }
+
+        .confirm-modal h3{
+            color:#e0f2fe;
+            margin-bottom:9px;
+        }
+
+        .confirm-modal p{
+            color:#cbd5e1;
+            margin-bottom:18px;
+        }
+
+        .modal-actions{
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+        }
+
+        .cancel-btn{
+            min-height:40px;
+            padding:9px 13px;
+            border:0;
+            border-radius:8px;
+            background:#334155;
+            color:white;
+            font-weight:700;
+            cursor:pointer;
+        }
+
+        .section h2{
+            color:#38bdf8;
+            font-size:21px;
+            margin-bottom:15px;
+        }
+
+        .table-wrap{
+            width:100%;
+            overflow-x:auto;
+            border-radius:14px;
+            border:1px solid rgba(255,255,255,0.08);
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            min-width:760px;
+            background:rgba(255,255,255,0.04);
+        }
+
+        th{
+            background:#38bdf8;
+            color:#0f172a;
+            padding:14px;
+            text-align:left;
+            font-size:14px;
+        }
+
+        td{
+            padding:13px 14px;
+            border-bottom:1px solid rgba(255,255,255,0.08);
+            color:#e2e8f0;
+            font-size:14px;
+            vertical-align:middle;
+        }
+
+        tr:hover{
+            background:rgba(255,255,255,0.05);
+        }
+
+        .muted{
+            color:#94a3b8;
+        }
+
+        .badge{
+            display:inline-flex;
+            align-items:center;
+            min-height:28px;
+            padding:5px 10px;
+            border-radius:999px;
+            background:rgba(56,189,248,0.13);
+            color:#7dd3fc;
+            font-size:12px;
+            font-weight:700;
+        }
+
+        .count-link{
+            min-width:42px;
+            min-height:34px;
+            padding:7px 12px;
+            border-radius:10px;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            background:rgba(56,189,248,0.14);
+            color:#7dd3fc;
+            text-decoration:none;
+            font-weight:700;
+        }
+
+        .count-link:hover{
+            background:rgba(56,189,248,0.24);
+        }
+
+        .action-row{
+            display:flex;
+            gap:8px;
+            flex-wrap:wrap;
+        }
+
+        .icon-btn{
+            width:40px;
+            height:40px;
+            border:none;
+            border-radius:10px;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            cursor:pointer;
+            transition:0.2s;
+        }
+
+        .icon-btn:hover{
+            transform:translateY(-2px);
+        }
+
+        .reset-btn{
+            background:#f59e0b;
+            color:#111827;
+        }
+
+        .delete-btn{
+            background:#ef4444;
+            color:white;
+        }
+
+        .icon-btn:disabled{
+            cursor:not-allowed;
+            opacity:0.45;
+            transform:none;
+        }
+
+        .empty{
+            padding:20px;
+            text-align:center;
+            color:#cbd5e1;
+            background:rgba(255,255,255,0.04);
+            border-radius:12px;
+        }
+
+        @media(max-width:760px){
+            body{
+                padding:18px;
+            }
+
+            .container{
+                padding:22px;
+            }
+
+            .topbar{
+                flex-direction:column;
+            }
+
+            .title h1{
+                font-size:27px;
+            }
+
+            .stats{
+                grid-template-columns:1fr;
+            }
+
+            .admin-form{
+                grid-template-columns:1fr;
+            }
+
+            .filter-form{
+                grid-template-columns:1fr;
+            }
+
+            .insight-grid{
+                grid-template-columns:1fr;
+            }
+
+            .bar-row{
+                grid-template-columns:1fr;
+                gap:7px;
+            }
+        }
+    </style>
+</head>
+<body class="app-main theme-{{ session.theme or 'dark' }}">
+{% include "_sidebar.html" %}
+
+<div class="container">
+    <div class="topbar">
+        <div class="title">
+            <h1><i class="fa-solid fa-user-shield"></i> Admin Control Center</h1>
+            <p>Manage application users and review recent user activity.</p>
+        </div>
+
+        <a href="/" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i>
+            Dashboard
+        </a>
+    </div>
+
+    {% if message %}
+    <div class="notice success">{{ message }}</div>
+    {% endif %}
+
+    {% if error %}
+    <div class="notice error">{{ error }}</div>
+    {% endif %}
+
+    <div class="stats">
+        <div class="stat">
+            <i class="fa-solid fa-users"></i>
+            <h2>{{ stats.users }}</h2>
+            <p>Total users</p>
+        </div>
+
+        <div class="stat">
+            <i class="fa-solid fa-user-shield"></i>
+            <h2>{{ stats.admins }}</h2>
+            <p>Admin accounts</p>
+        </div>
+
+        <div class="stat">
+            <i class="fa-solid fa-user"></i>
+            <h2>{{ stats.regular_users }}</h2>
+            <p>Regular user accounts</p>
+        </div>
+
+        <div class="stat">
+            <i class="fa-solid fa-user-check"></i>
+            <h2>{{ stats.active_users }}</h2>
+            <p>Users with recorded activity</p>
+        </div>
+
+        <div class="stat">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <h2>{{ stats.activities }}</h2>
+            <p>Recorded activity events</p>
+        </div>
+
+        <div class="stat">
+            <i class="fa-solid fa-user-lock"></i>
+            <h2>{{ stats.blocked_users }}</h2>
+            <p>Blocked accounts</p>
+        </div>
+
+        <div class="stat">
+            <i class="fa-solid fa-lock"></i>
+            <h2>{{ stats.locked_users }}</h2>
+            <p>Login locked accounts</p>
+        </div>
+
+        <div class="stat">
+            <i class="fa-solid fa-user-clock"></i>
+            <h2>{{ stats.pending_users }}</h2>
+            <p>Pending accounts</p>
+        </div>
+    </div>
+
+    <div class="insight-grid">
+        <div class="insight-box">
+            <h3><i class="fa-solid fa-chart-simple"></i> Most Used Options</h3>
+
+            {% if option_usage %}
+                {% for option in option_usage %}
+                <div class="bar-row">
+                    <span>{{ option.label }}</span>
+                    <div class="bar-track">
+                        <div class="bar-fill" style="width:{{ (option.count / max_option_count * 100) | round(0, 'floor') }}%;"></div>
+                    </div>
+                    <strong>{{ option.count }}</strong>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty">No option usage has been recorded yet.</div>
+            {% endif %}
+        </div>
+
+        <div class="insight-box">
+            <h3><i class="fa-solid fa-ranking-star"></i> Top Active Users</h3>
+
+            {% if top_active_users %}
+                {% for user in top_active_users %}
+                <div class="bar-row">
+                    <span>{{ user.name or user.username }}</span>
+                    <div class="bar-track">
+                        <div class="bar-fill" style="width:{{ (user.activity_count / (top_active_users[0].activity_count if top_active_users[0].activity_count else 1) * 100) | round(0, 'floor') }}%;"></div>
+                    </div>
+                    <strong>{{ user.activity_count }}</strong>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty">No active users yet.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if admin_alerts %}
+    <div class="section">
+        <h2><i class="fa-solid fa-bell"></i> Admin Notifications</h2>
+        <div class="alert-list">
+            {% for alert in admin_alerts %}
+            <div class="alert-item">
+                <i class="fa-solid {{ alert.icon }}"></i>
+                <div>
+                    <strong>{{ alert.title }}</strong>
+                    <span>{{ alert.text }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="insight-grid">
+        <div class="insight-box">
+            <h3><i class="fa-solid fa-signal"></i> Online Users</h3>
+            {% if online_users %}
+                {% for online in online_users %}
+                <div class="alert-item">
+                    <i class="fa-solid fa-circle" style="color:#22c55e;"></i>
+                    <div>
+                        <strong>{{ online.username }} - {{ online.current_page }}</strong>
+                        <span>{{ online.ip_address or "-" }} | Last seen {{ online.last_seen }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty">No users are online right now.</div>
+            {% endif %}
+        </div>
+
+        <div class="insight-box">
+            <h3><i class="fa-solid fa-bell"></i> Notification Bell</h3>
+            {% if notifications %}
+                {% for note in notifications %}
+                <div class="alert-item">
+                    <i class="fa-solid fa-bell"></i>
+                    <div>
+                        <strong>{{ note.title }}</strong>
+                        <span>{{ note.message }} | {{ note.created_at }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty">No admin notifications yet.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><i class="fa-solid fa-user-plus"></i> Create New Admin</h2>
+
+        <div class="management-box">
+            <form method="POST" class="admin-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="create_admin">
+
+                <div class="field">
+                    <label for="adminName">Name</label>
+                    <input id="adminName" type="text" name="name" placeholder="Account holder name" required>
+                </div>
+
+                <div class="field">
+                    <label for="adminUsername">Username</label>
+                    <input id="adminUsername" type="text" name="username" placeholder="Admin username" required>
+                </div>
+
+                <div class="field">
+                    <label for="adminPassword">Password</label>
+                    <input id="adminPassword" type="password" name="password" placeholder="Strong password" required>
+                </div>
+
+                <div class="field">
+                    <label for="adminRole">Role</label>
+                    <select id="adminRole" name="role">
+                        <option value="admin">Admin</option>
+                        <option value="super_admin">Super Admin</option>
+                    </select>
+                </div>
+
+                <button class="create-btn" type="submit">
+                    <i class="fa-solid fa-user-shield"></i>
+                    Create Admin
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><i class="fa-solid fa-address-book"></i> User Management</h2>
+
+        <form class="filter-form" method="GET">
+            <div class="field">
+                <label for="userSearch">Search User</label>
+                <input id="userSearch" type="text" name="user_search" value="{{ user_search }}" placeholder="Name or username">
+            </div>
+
+            <div class="field">
+                <label for="roleFilter">Role</label>
+                <select id="roleFilter" name="role_filter">
+                    <option value="">All roles</option>
+                    <option value="user" {% if role_filter == "user" %}selected{% endif %}>User</option>
+                    <option value="viewer" {% if role_filter == "viewer" %}selected{% endif %}>Viewer</option>
+                    <option value="analyst" {% if role_filter == "analyst" %}selected{% endif %}>Analyst</option>
+                    <option value="admin" {% if role_filter == "admin" %}selected{% endif %}>Admin</option>
+                    <option value="super_admin" {% if role_filter == "super_admin" %}selected{% endif %}>Super Admin</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="statusFilter">Status</label>
+                <select id="statusFilter" name="status_filter">
+                    <option value="">All statuses</option>
+                    <option value="active" {% if status_filter == "active" %}selected{% endif %}>Active</option>
+                    <option value="blocked" {% if status_filter == "blocked" %}selected{% endif %}>Blocked</option>
+                </select>
+            </div>
+
+            <button class="create-btn" type="submit">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                Search
+            </button>
+        </form>
+
+        <div class="export-row">
+            <a class="export-link" href="/admin/export/users">
+                <i class="fa-solid fa-file-csv"></i>
+                Export Users CSV
+            </a>
+            <a class="export-link" href="/admin/backup">
+                <i class="fa-solid fa-box-archive"></i>
+                Backup ZIP
+            </a>
+            <form method="POST" enctype="multipart/form-data" class="action-row">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="restore_backup">
+                <input type="file" name="backup_file" accept=".zip" required>
+                <button class="create-btn" type="submit">
+                    <i class="fa-solid fa-upload"></i>
+                    Restore Backup
+                </button>
+            </form>
+        </div>
+
+        <div class="management-grid">
+            <div class="management-box">
+                <h3><i class="fa-solid fa-user-shield"></i> Admin Details</h3>
+
+                {% if admin_users %}
+                <div class="table-wrap">
+                    <table>
+                        <tr>
+                            <th>Name</th>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Account</th>
+                            <th>Activity Count</th>
+                            <th>Last Seen</th>
+                            <th>Actions</th>
+                        </tr>
+
+                        {% for user in admin_users %}
+                        <tr>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.username }}</td>
+                            <td><span class="badge">{{ user.role }}</span></td>
+                            <td>
+                                {% if user.is_blocked %}
+                                <span class="badge status-blocked">Blocked</span>
+                                {% else %}
+                                <span class="badge">Active</span>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge">{{ user.account_status }}</span></td>
+                            <td>
+                                <a class="count-link" href="/admin?user={{ user.username | urlencode }}#activity">
+                                    {{ user.activity_count }}
+                                </a>
+                            </td>
+                            <td>
+                                {% if user.last_seen %}
+                                {{ user.last_seen }}
+                                {% else %}
+                                <span class="muted">No activity</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="action-row">
+                                    <form method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="hidden" name="action" value="update_role">
+                                        <select class="inline-select" name="role" onchange="this.form.submit()" {% if user.username == session.user %}disabled{% endif %}>
+                                            <option value="admin" {% if user.role == "admin" %}selected{% endif %}>Admin</option>
+                                            <option value="super_admin" {% if user.role == "super_admin" %}selected{% endif %}>Super Admin</option>
+                                        </select>
+                                    </form>
+
+                                    <form method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="hidden" name="action" value="update_status">
+                                        <select class="inline-select" name="account_status" onchange="this.form.submit()" {% if user.username == session.user %}disabled{% endif %}>
+                                            <option value="active" {% if user.account_status == "active" %}selected{% endif %}>Active</option>
+                                            <option value="pending" {% if user.account_status == "pending" %}selected{% endif %}>Pending</option>
+                                            <option value="suspended" {% if user.account_status == "suspended" %}selected{% endif %}>Suspended</option>
+                                        </select>
+                                    </form>
+
+                                    <form method="POST" data-confirm="Force logout this admin account?">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="hidden" name="action" value="force_logout">
+                                        <button class="icon-btn block-btn" type="submit" title="Force logout" {% if user.username == session.user %}disabled{% endif %}>
+                                            <i class="fa-solid fa-right-from-bracket"></i>
+                                        </button>
+                                    </form>
+
+                                    <form method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="hidden" name="action" value="reset_password">
+                                        <button class="icon-btn reset-btn" type="submit" title="Reset password" {% if user.username == session.user %}disabled{% endif %}>
+                                            <i class="fa-solid fa-key"></i>
+                                        </button>
+                                    </form>
+
+                                    {% if user.is_blocked %}
+                                    <form method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="hidden" name="action" value="unblock_user">
+                                        <button class="icon-btn unblock-btn" type="submit" title="Unblock admin" {% if user.username == session.user %}disabled{% endif %}>
+                                            <i class="fa-solid fa-lock-open"></i>
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <form method="POST" data-confirm="Block this admin account?">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="hidden" name="action" value="block_user">
+                                        <button class="icon-btn block-btn" type="submit" title="Block admin" {% if user.username == session.user %}disabled{% endif %}>
+                                            <i class="fa-solid fa-ban"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+
+                                    <form method="POST" data-confirm="Delete this admin and their activity records?">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="hidden" name="action" value="delete">
+                                        <button class="icon-btn delete-btn" type="submit" title="Delete admin" {% if user.username == session.user %}disabled{% endif %}>
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty">No admin accounts found.</div>
+                {% endif %}
+            </div>
+
+            <div class="management-box">
+                <h3><i class="fa-solid fa-users"></i> User Details</h3>
+
+                {% if regular_users %}
+                <div class="table-wrap">
+                    <table>
+                        <tr>
+                            <th>Name</th>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Account</th>
+                            <th>Activity Count</th>
+                            <th>Last Seen</th>
+                            <th>Actions</th>
+                        </tr>
+
+                        {% for user in regular_users %}
+                        <tr>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.username }}</td>
+                            <td><span class="badge">{{ user.role }}</span></td>
+                            <td>
+                                {% if user.is_blocked %}
+                                <span class="badge status-blocked">Blocked</span>
+                                {% else %}
+                                <span class="badge">Active</span>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge">{{ user.account_status }}</span></td>
+                            <td>
+                                <a class="count-link" href="/admin?user={{ user.username | urlencode }}#activity">
+                                    {{ user.activity_count }}
+                                </a>
+                            </td>
+                            <td>
+                                {% if user.last_seen %}
+                                {{ user.last_seen }}
+                                {% else %}
+                                <span class="muted">No activity</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="action-row">
+                                    <form method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="hidden" name="action" value="update_role">
+                                        <select class="inline-select" name="role" onchange="this.form.submit()">
+                                            <option value="user" {% if user.role == "user" %}selected{% endif %}>User</option>
+                                            <option value="analyst" {% if user.role == "analyst" %}selected{% endif %}>Analyst</option>
+                                            <option value="viewer" {% if user.role == "viewer" %}selected{% endif %}>Viewer</option>
+                                        </select>
+                                    </form>
+
+                                    <form method="POST" data-confirm="Make this user an admin?">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="hidden" name="action" value="promote_admin">
+                                        <button class="icon-btn promote-btn" type="submit" title="Make admin">
+                                            <i class="fa-solid fa-user-shield"></i>
+                                        </button>
+                                    </form>
+
+                                    <form method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="hidden" name="action" value="update_status">
+                                        <select class="inline-select" name="account_status" onchange="this.form.submit()">
+                                            <option value="active" {% if user.account_status == "active" %}selected{% endif %}>Active</option>
+                                            <option value="pending" {% if user.account_status == "pending" %}selected{% endif %}>Pending</option>
+                                            <option value="suspended" {% if user.account_status == "suspended" %}selected{% endif %}>Suspended</option>
+                                        </select>
+                                    </form>
+
+                                    <form method="POST" data-confirm="Force logout this user?">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="hidden" name="action" value="force_logout">
+                                        <button class="icon-btn block-btn" type="submit" title="Force logout">
+                                            <i class="fa-solid fa-right-from-bracket"></i>
+                                        </button>
+                                    </form>
+
+                                    {% if user.is_blocked %}
+                                    <form method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="hidden" name="action" value="unblock_user">
+                                        <button class="icon-btn unblock-btn" type="submit" title="Unblock user">
+                                            <i class="fa-solid fa-lock-open"></i>
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <form method="POST" data-confirm="Block this user account?">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="hidden" name="action" value="block_user">
+                                        <button class="icon-btn block-btn" type="submit" title="Block user">
+                                            <i class="fa-solid fa-ban"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+
+                                    <form method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="hidden" name="action" value="reset_password">
+                                        <button class="icon-btn reset-btn" type="submit" title="Reset password">
+                                            <i class="fa-solid fa-key"></i>
+                                        </button>
+                                    </form>
+
+                                    <form method="POST" data-confirm="Delete this user and their activity records?">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="hidden" name="action" value="delete">
+                                        <button class="icon-btn delete-btn" type="submit" title="Delete user">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty">No regular user accounts found.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><i class="fa-solid fa-sliders"></i> Tool Permissions</h2>
+
+        {% if regular_users %}
+        <div class="management-grid">
+            {% for user in regular_users %}
+            <div class="management-box">
+                <h3><i class="fa-solid fa-user-gear"></i> {{ user.name }} <span class="muted">@{{ user.username }}</span></h3>
+                <form method="POST" class="action-row">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <input type="hidden" name="action" value="update_permissions">
+                    {% for tool in tools %}
+                    <label class="badge">
+                        <input type="checkbox" name="tools" value="{{ tool.key }}" {% if user.tool_permissions[tool.key] %}checked{% endif %}>
+                        {{ tool.label }}
+                    </label>
+                    {% endfor %}
+                    <button class="create-btn" type="submit">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Save
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty">No regular users available for permission changes.</div>
+        {% endif %}
+    </div>
+
+    <div class="section" id="activity">
+        <h2>
+            <i class="fa-solid fa-list-check"></i>
+            {% if selected_user %}
+            Activity for {{ selected_user }}
+            {% else %}
+            Recent Activity
+            {% endif %}
+        </h2>
+
+        {% if selected_user %}
+        <p class="muted" style="margin-bottom:14px;">
+            Showing actions done by {{ selected_user }}.
+            <a href="/admin#activity" style="color:#38bdf8;">Show all activity</a>
+        </p>
+        {% endif %}
+
+        <form class="filter-form" method="GET" action="/admin#activity">
+            <div class="field">
+                <label for="activityUser">Username</label>
+                <input id="activityUser" type="text" name="user" value="{{ selected_user }}" placeholder="All users">
+            </div>
+
+            <div class="field">
+                <label for="activityTool">Option</label>
+                <select id="activityTool" name="tool">
+                    <option value="">All options</option>
+                    <optgroup label="Account">
+                    <option value="login" {% if selected_tool == "login" %}selected{% endif %}>Login</option>
+                    <option value="logout" {% if selected_tool == "logout" %}selected{% endif %}>Logout</option>
+                    <option value="change_password" {% if selected_tool == "change_password" %}selected{% endif %}>Change Password</option>
+                    <option value="view_dashboard" {% if selected_tool == "view_dashboard" %}selected{% endif %}>Open Dashboard</option>
+                    <option value="view_profile" {% if selected_tool == "view_profile" %}selected{% endif %}>Open Profile</option>
+                    </optgroup>
+
+                    <optgroup label="Log Analysis">
+                    <option value="open_log_analysis" {% if selected_tool == "open_log_analysis" %}selected{% endif %}>Open Log Analysis</option>
+                    <option value="log_analysis" {% if selected_tool == "log_analysis" %}selected{% endif %}>Analyze Log File</option>
+                    </optgroup>
+
+                    <optgroup label="Network Recon">
+                    <option value="open_network_recon" {% if selected_tool == "open_network_recon" %}selected{% endif %}>Open Network Recon</option>
+                    <option value="network_recon" {% if selected_tool == "network_recon" %}selected{% endif %}>Scan Target</option>
+                    </optgroup>
+
+                    <optgroup label="Packet Inspection">
+                    <option value="open_packet_analysis" {% if selected_tool == "open_packet_analysis" %}selected{% endif %}>Open Packet Inspection</option>
+                    <option value="packet_analysis" {% if selected_tool == "packet_analysis" %}selected{% endif %}>Analyze PCAP File</option>
+                    <option value="open_live_packet_monitor" {% if selected_tool == "open_live_packet_monitor" %}selected{% endif %}>Open Live Monitor</option>
+                    <option value="live_packet_monitor" {% if selected_tool == "live_packet_monitor" %}selected{% endif %}>Start Live Monitoring</option>
+                    </optgroup>
+
+                    <optgroup label="Threat Intelligence">
+                    <option value="open_threat_intelligence" {% if selected_tool == "open_threat_intelligence" %}selected{% endif %}>Open Threat Intelligence</option>
+                    <option value="threat_intelligence" {% if selected_tool == "threat_intelligence" %}selected{% endif %}>Analyze Website</option>
+                    </optgroup>
+
+                    <optgroup label="Admin">
+                    <option value="admin_create_admin" {% if selected_tool == "admin_create_admin" %}selected{% endif %}>Create Admin</option>
+                    <option value="admin_promote_user" {% if selected_tool == "admin_promote_user" %}selected{% endif %}>Promote User</option>
+                    <option value="admin_reset_password" {% if selected_tool == "admin_reset_password" %}selected{% endif %}>Reset Password</option>
+                    <option value="admin_block_user" {% if selected_tool == "admin_block_user" %}selected{% endif %}>Block User</option>
+                    <option value="admin_unblock_user" {% if selected_tool == "admin_unblock_user" %}selected{% endif %}>Unblock User</option>
+                    <option value="admin_update_role" {% if selected_tool == "admin_update_role" %}selected{% endif %}>Update Role</option>
+                    <option value="admin_delete_user" {% if selected_tool == "admin_delete_user" %}selected{% endif %}>Delete User</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="activitySearch">Search</label>
+                <input id="activitySearch" type="text" name="search" value="{{ activity_search }}" placeholder="Search details or IP">
+            </div>
+
+            <button class="create-btn" type="submit">
+                <i class="fa-solid fa-filter"></i>
+                Filter
+            </button>
+        </form>
+
+        <div class="export-row">
+            <a class="export-link" href="/admin/export/activity">
+                <i class="fa-solid fa-file-csv"></i>
+                Export Activity CSV
+            </a>
+        </div>
+
+        {% if activities %}
+        <div class="table-wrap">
+            <table>
+                <tr>
+                    <th>Time</th>
+                    <th>User</th>
+                    <th>Option</th>
+                    <th>Details</th>
+                    <th>Raw Action</th>
+                    <th>IP Address</th>
+                </tr>
+
+                {% for activity in activities %}
+                <tr>
+                    <td>{{ activity.created_at }}</td>
+                    <td>{{ activity.username }}</td>
+                    <td><span class="badge">{{ activity.label }}</span></td>
+                    <td>{{ activity.details or "-" }}</td>
+                    <td>{{ activity.action }}</td>
+                    <td>{{ activity.ip_address or "-" }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% else %}
+        <div class="empty">No user activity has been recorded yet.</div>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <h2><i class="fa-solid fa-file-lines"></i> Recent Saved Reports</h2>
+
+        <div class="export-row">
+            <a class="export-link" href="/admin/export/reports">
+                <i class="fa-solid fa-file-csv"></i>
+                Export Reports CSV
+            </a>
+        </div>
+
+        {% if reports %}
+        <div class="table-wrap">
+            <table>
+                <tr>
+                    <th>Time</th>
+                    <th>User</th>
+                    <th>Tool</th>
+                    <th>Target</th>
+                    <th>Summary</th>
+                    <th>Actions</th>
+                </tr>
+
+                {% for report in reports %}
+                <tr>
+                    <td>{{ report.created_at }}</td>
+                    <td>{{ report.username }}</td>
+                    <td><span class="badge">{{ report.tool }}</span></td>
+                    <td>{{ report.target or "-" }}</td>
+                    <td>{{ report.summary or "-" }}</td>
+                    <td>
+                        <a href="/reports/{{ report.id }}" class="badge">View</a>
+                        <a href="/reports/{{ report.id }}/download-pdf" class="badge">PDF</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% else %}
+        <div class="empty">No scan reports have been saved yet.</div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="modal-backdrop" id="confirmBackdrop" aria-hidden="true">
+    <div class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+        <h3 id="confirmTitle">Confirm Action</h3>
+        <p id="confirmText">Are you sure?</p>
+        <div class="modal-actions">
+            <button class="cancel-btn" type="button" id="cancelConfirm">Cancel</button>
+            <button class="create-btn" type="button" id="acceptConfirm">
+                <i class="fa-solid fa-check"></i>
+                Confirm
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='pwa.js') }}"></script>
+<script>
+    const confirmBackdrop = document.getElementById("confirmBackdrop");
+    const confirmText = document.getElementById("confirmText");
+    const cancelConfirm = document.getElementById("cancelConfirm");
+    const acceptConfirm = document.getElementById("acceptConfirm");
+    let pendingForm = null;
+
+    document.querySelectorAll("form[data-confirm]").forEach((form) => {
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            pendingForm = form;
+            confirmText.textContent = form.dataset.confirm || "Are you sure?";
+            confirmBackdrop.classList.add("active");
+        });
+    });
+
+    cancelConfirm.addEventListener("click", () => {
+        pendingForm = null;
+        confirmBackdrop.classList.remove("active");
+    });
+
+    acceptConfirm.addEventListener("click", () => {
+        if (pendingForm) {
+            pendingForm.submit();
+        }
+    });
+</script>
+</body>
+</html>

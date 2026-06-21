@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CyberShield">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='pwa/icon.svg') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='pwa/maskable-icon.svg') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='app-shell.css') }}">
+    <title>Cyber Security Dashboard</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Poppins',sans-serif;
+        }
+
+        body{
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background:
+            linear-gradient(135deg,#0f172a,#111827,#1e293b);
+            overflow-x:hidden;
+            overflow-y:auto;
+            padding:30px 0;
+            color:white;
+        }
+
+        /* Background Glow */
+        body::before{
+            content:'';
+            position:absolute;
+            width:500px;
+            height:500px;
+            background:#38bdf8;
+            border-radius:50%;
+            filter:blur(180px);
+            opacity:0.15;
+            top:-100px;
+            left:-100px;
+        }
+
+        body::after{
+            content:'';
+            position:absolute;
+            width:400px;
+            height:400px;
+            background:#22c55e;
+            border-radius:50%;
+            filter:blur(160px);
+            opacity:0.12;
+            bottom:-100px;
+            right:-100px;
+        }
+
+        .dashboard{
+            position:relative;
+            width:90%;
+            max-width:850px;
+            background:rgba(255,255,255,0.05);
+            backdrop-filter:blur(15px);
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:25px;
+            padding:45px;
+            text-align:center;
+            box-shadow:0 0 35px rgba(0,0,0,0.5);
+            z-index:1;
+        }
+
+        .dashboard h1{
+            font-size:40px;
+            margin-bottom:12px;
+            color:#38bdf8;
+            font-weight:700;
+        }
+
+        .dashboard p{
+            color:#cbd5e1;
+            margin-bottom:35px;
+            font-size:15px;
+        }
+
+        .account-panel{
+            width:max-content;
+            max-width:100%;
+            margin-left:auto;
+            display:flex;
+            align-items:center;
+            justify-content:flex-start;
+            gap:14px;
+            padding:16px 18px;
+            margin-bottom:26px;
+            border-radius:8px;
+            background:rgba(56,189,248,0.10);
+            border:1px solid rgba(56,189,248,0.24);
+            text-align:left;
+        }
+
+        .account-panel i{
+            width:42px;
+            height:42px;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            flex:0 0 auto;
+            border-radius:8px;
+            background:rgba(56,189,248,0.14);
+            color:#38bdf8;
+            font-size:20px;
+        }
+
+        .account-name{
+            display:block;
+            color:#f8fafc;
+            font-size:24px;
+            font-weight:700;
+            line-height:1.15;
+        }
+
+        .account-username{
+            display:block;
+            color:#93c5fd;
+            font-size:14px;
+            font-weight:500;
+            margin-top:4px;
+        }
+
+        .grid{
+            display:grid;
+            grid-template-columns:repeat(2, 1fr);
+            gap:25px;
+            justify-content:center;
+            margin-top:30px;
+        }
+
+        .summary-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+            gap:14px;
+            margin-top:28px;
+            text-align:left;
+        }
+
+        .summary-card{
+            background:rgba(255,255,255,0.08);
+            border:1px solid rgba(255,255,255,0.12);
+            border-radius:8px;
+            padding:16px;
+        }
+
+        .summary-card strong{
+            display:block;
+            color:#7dd3fc;
+            font-size:22px;
+            margin-bottom:5px;
+        }
+
+        .summary-card span{
+            color:#cbd5e1;
+            font-size:13px;
+        }
+
+        .card{
+            background:rgba(255,255,255,0.05);
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:20px;
+            padding:28px 20px;
+            text-decoration:none;
+            color:white;
+            transition:0.3s;
+            position:relative;
+            overflow:hidden;
+            min-height:245px;
+            display:flex;
+            flex-direction:column;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        .card:hover,
+        .card:focus-visible{
+            transform:translateY(-8px);
+            box-shadow:0 0 25px rgba(56,189,248,0.25);
+            border-color:#38bdf8;
+            outline:none;
+        }
+
+        .card i{
+            font-size:42px;
+            margin-bottom:15px;
+            color:#38bdf8;
+        }
+
+        .card h2{
+            font-size:20px;
+            margin-bottom:10px;
+        }
+
+        .card p{
+            font-size:13px;
+            color:#cbd5e1;
+            margin-bottom:0;
+            line-height:1.5;
+        }
+
+        .card-content{
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+        }
+
+        .card-action{
+            width:100%;
+            max-width:190px;
+            min-height:44px;
+            margin-top:22px;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+            border-radius:12px;
+            background:#38bdf8;
+            color:#0f172a;
+            font-size:14px;
+            font-weight:700;
+            transition:0.3s;
+        }
+
+        .card-action i{
+            font-size:14px;
+            margin:0;
+            color:#0f172a;
+        }
+
+        .card:hover .card-action,
+        .card:focus-visible .card-action{
+            background:#0ea5e9;
+        }
+
+        .actions{
+            margin-top:35px;
+            display:flex;
+            justify-content:center;
+            gap:14px;
+            flex-wrap:wrap;
+        }
+
+        .action-btn{
+            display:inline-block;
+            padding:14px 28px;
+            color:white;
+            border:0;
+            border-radius:14px;
+            text-decoration:none;
+            font-weight:600;
+            font-size:16px;
+            cursor:pointer;
+            transition:0.3s;
+        }
+
+        .action-btn:hover{
+            transform:scale(1.05);
+        }
+
+        .change-btn{
+            background:#2563eb;
+        }
+
+        .change-btn:hover{
+            background:#1d4ed8;
+        }
+
+        .install-btn{
+            background:#22c55e;
+        }
+
+        .install-btn:hover{
+            background:#16a34a;
+        }
+
+        .action-btn[hidden]{
+            display:none;
+        }
+
+        .logout-btn{
+            background:#ef4444;
+        }
+
+        .logout-btn:hover{
+            background:#dc2626;
+        }
+
+        /* Animated Border Effect */
+        .card::before{
+            content:'';
+            position:absolute;
+            width:100%;
+            height:100%;
+            top:0;
+            left:-100%;
+            background:
+            linear-gradient(
+                120deg,
+                transparent,
+                rgba(255,255,255,0.08),
+                transparent
+            );
+            transition:0.5s;
+        }
+
+        .card:hover::before{
+            left:100%;
+        }
+
+        @media(max-width:700px){
+
+            .dashboard{
+                padding:25px;
+            }
+
+            .dashboard h1{
+                font-size:28px;
+            }
+
+            .grid{
+                grid-template-columns:1fr;
+            }
+
+            .card{
+                min-height:220px;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body class="app-main theme-{{ session.theme or 'dark' }}">
+{% include "_sidebar.html" %}
+
+<div class="dashboard">
+
+    <h1>
+        <i class="fa-solid fa-shield-halved"></i>
+        CYBER SHIELD X
+    </h1>
+
+    <p>
+        Integrated Cybersecurity Monitoring and Threat Analysis Platform 
+    </p>
+
+    <div class="account-panel">
+        <i class="fa-solid fa-user"></i>
+        <div>
+            <span class="account-name">{{ account_name }}</span>
+            <span class="account-username">{{ user }}</span>
+        </div>
+    </div>
+
+    <div class="summary-grid">
+        <div class="summary-card">
+            <strong>{{ dashboard_summary.total_reports }}</strong>
+            <span>Your saved reports</span>
+        </div>
+        <div class="summary-card">
+            <strong>{{ dashboard_summary.allowed_tools | length }}</strong>
+            <span>Available tools</span>
+        </div>
+        <div class="summary-card">
+            <strong>
+                {% if dashboard_summary.last_activity %}
+                {{ dashboard_summary.last_activity.label }}
+                {% else %}
+                No activity
+                {% endif %}
+            </strong>
+            <span>Last used option</span>
+        </div>
+        <div class="summary-card">
+            <strong>
+                {% if dashboard_summary.last_report %}
+                {{ dashboard_summary.last_report }}
+                {% else %}
+                No report
+                {% endif %}
+            </strong>
+            <span>Last report date</span>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        {% if "log" in dashboard_summary.allowed_tool_keys %}
+        <!-- Log Analysis -->
+        <a href="/log" class="card">
+
+            <div class="card-content">
+                <i class="fa-solid fa-file-shield"></i>
+
+                <h2>Log Analysis</h2>
+
+                <p>
+                    Detect suspicious IPs, brute force attacks and unauthorized access.
+                </p>
+            </div>
+
+            <span class="card-action">
+                <i class="fa-solid fa-arrow-right"></i>
+                Open Tool
+            </span>
+
+        </a>
+        {% endif %}
+
+        {% if "recon" in dashboard_summary.allowed_tool_keys %}
+        <!-- Network Recon -->
+        <a href="/recon" class="card">
+
+            <div class="card-content">
+                <i class="fa-solid fa-network-wired"></i>
+
+                <h2>Network Recon</h2>
+
+                <p>
+                    Scan targets and identify active ports & running services.
+                </p>
+            </div>
+
+            <span class="card-action">
+                <i class="fa-solid fa-arrow-right"></i>
+                Open Tool
+            </span>
+
+        </a>
+        {% endif %}
+
+        {% if "threat" in dashboard_summary.allowed_tool_keys %}
+        <!-- Threat Intelligence -->
+        <a href="/threat" class="card">
+
+            <div class="card-content">
+                <i class="fa-solid fa-skull-crossbones"></i>
+
+                <h2>Threat Intelligence</h2>
+
+                <p>
+                    Analyze malicious indicators and monitor cyber threats.
+                </p>
+            </div>
+
+            <span class="card-action">
+                <i class="fa-solid fa-arrow-right"></i>
+                Open Tool
+            </span>
+
+        </a>
+        {% endif %}
+
+        {% if "packet" in dashboard_summary.allowed_tool_keys %}
+        <!-- Packet Inspection -->
+        <a href="/packet" class="card">
+
+            <div class="card-content">
+                <i class="fa-solid fa-diagram-project"></i>
+
+                <h2>Packet Inspection</h2>
+
+                <p>
+                    Inspect packets and monitor suspicious network activity.
+                </p>
+            </div>
+
+            <span class="card-action">
+                <i class="fa-solid fa-arrow-right"></i>
+                Open Tool
+            </span>
+
+        </a>
+        {% endif %}
+
+        {% if is_admin %}
+        <!-- Admin Control Center -->
+        <a href="/admin" class="card">
+
+            <div class="card-content">
+                <i class="fa-solid fa-user-shield"></i>
+
+                <h2>Admin Center</h2>
+
+                <p>
+                    Manage users, reset access and review account activity.
+                </p>
+            </div>
+
+            <span class="card-action">
+                <i class="fa-solid fa-arrow-right"></i>
+                Open Admin
+            </span>
+
+        </a>
+        {% endif %}
+
+    </div>
+
+    <div class="actions">
+        <a href="/change-password" class="action-btn change-btn">
+            <i class="fa-solid fa-user-lock"></i>
+            Change Password
+        </a>
+
+        <a href="/profile" class="action-btn change-btn">
+            <i class="fa-solid fa-id-card"></i>
+            Profile
+        </a>
+
+        <a href="/reports" class="action-btn change-btn">
+            <i class="fa-solid fa-folder-open"></i>
+            Reports
+        </a>
+
+        <a href="/help" class="action-btn change-btn">
+            <i class="fa-solid fa-circle-question"></i>
+            Help
+        </a>
+
+        <button class="action-btn install-btn" type="button" data-install-app hidden>
+            <i class="fa-solid fa-mobile-screen-button"></i>
+            Install App
+        </button>
+
+        <a href="/logout" class="action-btn logout-btn">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Logout
+        </a>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='pwa.js') }}"></script>
+</body>
+</html>

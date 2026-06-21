@@ -1,0 +1,19 @@
+{
+    "suspicious_ips": [
+        "10.0.0.5",
+        "172.16.0.3",
+        "192.168.1.10",
+        "198.51.100.22",
+        "203.0.113.45"
+    ],
+    "brute_force": {
+        "198.51.100.22": 9103,
+        "203.0.113.45": 9105,
+        "172.16.0.3": 9765,
+        "192.168.1.10": 9177,
+        "10.0.0.5": 10101
+    },
+    "unauthorized": [],
+    "alert": true,
+    "alert_message": "Alert: 5 suspicious IP(s), 47251 brute-force attempt(s), and 0 unauthorized IP(s) detected."
+}

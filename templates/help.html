@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='app-shell.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>Help</title>
+    <style>
+        *{box-sizing:border-box;font-family:Arial,sans-serif;margin:0;padding:0;}
+        body{min-height:100vh;background:linear-gradient(135deg,#0f172a,#111827,#1e293b);color:white;padding:30px;}
+        .container{max-width:1050px;margin:auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:28px;}
+        h1{color:#38bdf8;margin-bottom:18px;}
+        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+        .box{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:18px;}
+        .box i{color:#38bdf8;font-size:24px;margin-bottom:10px;}
+        .box h2{font-size:18px;margin-bottom:8px;}
+        .box p{color:#cbd5e1;font-size:14px;line-height:1.5;}
+    </style>
+</head>
+<body class="app-main theme-{{ session.theme or 'dark' }}">
+{% include "_sidebar.html" %}
+<div class="container">
+    <h1><i class="fa-solid fa-circle-question"></i> Help</h1>
+    <div class="grid">
+        <div class="box"><i class="fa-solid fa-file-shield"></i><h2>Log Analysis</h2><p>Upload a .log or .txt file to detect suspicious IPs, failed logins, and unusual access attempts.</p></div>
+        <div class="box"><i class="fa-solid fa-network-wired"></i><h2>Network Recon</h2><p>Enter a target host to scan for open ports and basic exposure details.</p></div>
+        <div class="box"><i class="fa-solid fa-diagram-project"></i><h2>Packet Inspection</h2><p>Upload a .pcap file or run live monitoring to inspect network packets.</p></div>
+        <div class="box"><i class="fa-solid fa-globe"></i><h2>Threat Intelligence</h2><p>Analyze a website or indicator and save the result as a report.</p></div>
+        <div class="box"><i class="fa-solid fa-folder-open"></i><h2>Reports</h2><p>Open report history to view, download, search, or compare saved scan results.</p></div>
+        <div class="box"><i class="fa-solid fa-user-shield"></i><h2>Admin</h2><p>Admins can manage users, permissions, activity, sessions, reports, notifications, and backups.</p></div>
+    </div>
+</div>
+</body>
+</html>

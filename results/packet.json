@@ -1,0 +1,37 @@
+{
+    "total_packets": 4,
+    "attack_summary": {
+        "SQL Injection": 1,
+        "XSS Attack": 1,
+        "Command Injection": 1,
+        "Normal": 1
+    },
+    "packets": [
+        {
+            "source": "192.168.1.10",
+            "destination": "192.168.1.20",
+            "protocol": "TCP",
+            "attack": "Normal"
+        },
+        {
+            "source": "10.0.0.5",
+            "destination": "192.168.1.20",
+            "protocol": "TCP",
+            "attack": "SQL Injection"
+        },
+        {
+            "source": "172.16.0.3",
+            "destination": "192.168.1.20",
+            "protocol": "TCP",
+            "attack": "XSS Attack"
+        },
+        {
+            "source": "192.168.1.50",
+            "destination": "192.168.1.20",
+            "protocol": "TCP",
+            "attack": "Command Injection"
+        }
+    ],
+    "mode": "pcap",
+    "error": null
+}

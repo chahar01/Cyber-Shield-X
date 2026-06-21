@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CyberShield">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='pwa/icon.svg') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='pwa/maskable-icon.svg') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='app-shell.css') }}">
+    <title>Network Reconnaissance</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Poppins',sans-serif;
+        }
+
+        body{
+            min-height:100vh;
+            background:linear-gradient(135deg,#0f172a,#111827,#1e293b);
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            padding:25px;
+            color:white;
+        }
+
+        .container{
+            width:100%;
+            max-width:950px;
+            background:rgba(255,255,255,0.05);
+            backdrop-filter:blur(12px);
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:22px;
+            padding:35px;
+            box-shadow:0 0 35px rgba(0,0,0,0.45);
+        }
+
+        .title{
+            text-align:center;
+            margin-bottom:30px;
+        }
+
+        .title h1{
+            font-size:34px;
+            color:#38bdf8;
+            margin-bottom:10px;
+        }
+
+        .title p{
+            color:#cbd5e1;
+            font-size:14px;
+        }
+
+        .scan-box{
+            background:rgba(255,255,255,0.03);
+            border:2px dashed #38bdf8;
+            border-radius:18px;
+            padding:35px;
+            text-align:center;
+        }
+
+        .scan-box i{
+            font-size:55px;
+            color:#38bdf8;
+            margin-bottom:15px;
+        }
+
+        input{
+            width:100%;
+            padding:14px;
+            border:none;
+            border-radius:12px;
+            outline:none;
+            background:rgba(255,255,255,0.08);
+            color:white;
+            margin-top:15px;
+            font-size:15px;
+        }
+
+        input::placeholder{
+            color:#cbd5e1;
+        }
+
+        .btn{
+            margin-top:20px;
+            min-width:220px;
+            min-height:46px;
+            padding:12px 22px;
+            border:none;
+            border-radius:12px;
+            cursor:pointer;
+            font-size:15px;
+            font-weight:600;
+            transition:0.3s;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+        }
+
+        .form-actions{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+
+        .scan-btn{
+            background:#38bdf8;
+            color:#0f172a;
+        }
+
+        .scan-btn:hover{
+            background:#0ea5e9;
+            transform:scale(1.05);
+        }
+
+        .download-btn{
+            background:#22c55e;
+            color:white;
+        }
+
+        .download-btn:hover{
+            background:#16a34a;
+        }
+
+        .results{
+            margin-top:35px;
+        }
+
+        .alert-banner{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:14px;
+            margin-top:25px;
+            padding:16px 18px;
+            border-radius:12px;
+            background:rgba(239,68,68,0.14);
+            border:1px solid rgba(248,113,113,0.55);
+            color:#fee2e2;
+            box-shadow:0 0 22px rgba(239,68,68,0.18);
+            text-align:center;
+        }
+
+        .alert-banner i{
+            color:#f87171;
+            font-size:24px;
+        }
+
+        .results h2{
+            margin-bottom:20px;
+            color:#38bdf8;
+            text-align:center;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            overflow:hidden;
+            border-radius:15px;
+            background:rgba(255,255,255,0.04);
+        }
+
+        th{
+            background:#38bdf8;
+            color:#0f172a;
+            padding:15px;
+            text-align:center;
+            font-size:15px;
+        }
+
+        td{
+            padding:14px;
+            text-align:center;
+            border-bottom:1px solid rgba(255,255,255,0.08);
+            color:#e2e8f0;
+        }
+
+        tr:hover{
+            background:rgba(255,255,255,0.05);
+        }
+
+        .safe{
+            color:#22c55e;
+            font-weight:600;
+        }
+
+        .unknown{
+            color:#f59e0b;
+            font-weight:600;
+        }
+
+        .no-result{
+            margin-top:25px;
+            text-align:center;
+            background:rgba(255,255,255,0.04);
+            padding:20px;
+            border-radius:12px;
+            color:#e2e8f0;
+        }
+
+        .actions{
+            margin-top:25px;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+
+        .back-link{
+            color:#38bdf8;
+            text-decoration:none;
+            font-weight:500;
+        }
+
+        .back-link:hover{
+            text-decoration:underline;
+        }
+
+        @media(max-width:700px){
+
+            .container{
+                padding:20px;
+            }
+
+            .title h1{
+                font-size:25px;
+            }
+
+            table{
+                font-size:13px;
+            }
+
+        }
+
+    </style>
+</head>
+<body class="app-main theme-{{ session.theme or 'dark' }}">
+{% include "_sidebar.html" %}
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="title">
+        <h1>
+            <i class="fa-solid fa-network-wired"></i>
+            Network Reconnaissance
+        </h1>
+
+        <p>Scan targets and identify active open ports & services</p>
+    </div>
+
+    <!-- Scan Form -->
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="scan-box">
+
+            <i class="fa-solid fa-shield-cat"></i>
+
+            <h2>Target Scanner</h2>
+
+            <input type="text"
+                   name="ip"
+                   placeholder="Enter IP or Domain (Example: 127.0.0.1)"
+                   required>
+
+            <div class="form-actions">
+                <button type="submit" class="btn scan-btn">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    Start Scan
+                </button>
+            </div>
+
+        </div>
+
+    </form>
+
+    <!-- Results -->
+    {% if error %}
+    <div class="no-result">{{ error }}</div>
+    {% endif %}
+
+    {% if ports is not none %}
+
+        {% if ports %}
+
+        {% if alert and alert.alert %}
+        <div class="alert-banner" role="alert">
+            <i class="fa-solid fa-bell"></i>
+            <strong>{{ alert.alert_message }}</strong>
+        </div>
+        {% endif %}
+
+        <div class="results">
+
+            <h2>
+                <i class="fa-solid fa-diagram-project"></i>
+                Open Ports Detected
+            </h2>
+
+            <table>
+
+                <tr>
+                    <th>Port</th>
+                    <th>Service</th>
+                    <th>Status</th>
+                </tr>
+
+                {% for item in ports %}
+
+                <tr>
+
+                    <td>{{ item.port }}</td>
+
+                    <td>
+
+                        {% if item.service == "Unknown" %}
+                            <span class="unknown">
+                                {{ item.service }}
+                            </span>
+
+                        {% else %}
+                            <span class="safe">
+                                {{ item.service }}
+                            </span>
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        <span class="safe">
+                            OPEN
+                        </span>
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+            <div class="actions">
+
+                <a href="/download_recon">
+
+                    <button class="btn download-btn">
+                        <i class="fa-solid fa-download"></i>
+                        Download JSON Report
+                    </button>
+
+                </a>
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+        <div class="no-result">
+
+            <h3>
+                <i class="fa-solid fa-circle-check"></i>
+                No Open Ports Found
+            </h3>
+
+            <p>
+                Target may be secure or no active services are running.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    {% endif %}
+
+    <!-- Back -->
+    <div class="actions">
+
+        <a href="/" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Home
+        </a>
+
+    </div>
+
+</div>
+
+{% if alert and alert.alert %}
+<script>
+    function playAlertBeep() {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) {
+            return;
+        }
+
+        const audio = new AudioContext();
+        const oscillator = audio.createOscillator();
+        const gain = audio.createGain();
+
+        oscillator.type = "sine";
+        oscillator.frequency.value = 880;
+        gain.gain.setValueAtTime(0.001, audio.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.35, audio.currentTime + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + 0.45);
+
+        oscillator.connect(gain);
+        gain.connect(audio.destination);
+        oscillator.start();
+        oscillator.stop(audio.currentTime + 0.45);
+    }
+
+    setTimeout(playAlertBeep, 250);
+</script>
+{% endif %}
+
+<script src="{{ url_for('static', filename='pwa.js') }}"></script>
+</body>
+</html>

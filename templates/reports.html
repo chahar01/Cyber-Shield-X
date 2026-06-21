@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='app-shell.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>Report History</title>
+    <style>
+        *{box-sizing:border-box;font-family:Arial,sans-serif;margin:0;padding:0;}
+        body{min-height:100vh;background:linear-gradient(135deg,#0f172a,#111827,#1e293b);color:white;padding:30px;}
+        .container{max-width:1200px;margin:auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:28px;}
+        h1{color:#38bdf8;margin-bottom:18px;}
+        .filter{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px;}
+        input,select,button{min-height:42px;border:0;border-radius:8px;padding:10px 12px;}
+        button{background:#38bdf8;color:#0f172a;font-weight:700;cursor:pointer;}
+        .table-wrap{overflow-x:auto;border:1px solid rgba(255,255,255,0.08);border-radius:8px;}
+        table{width:100%;border-collapse:collapse;min-width:850px;background:rgba(255,255,255,0.04);}
+        th{background:#38bdf8;color:#0f172a;text-align:left;padding:13px;}
+        td{padding:13px;border-bottom:1px solid rgba(255,255,255,0.08);color:#e2e8f0;}
+        .badge{display:inline-flex;min-height:30px;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(56,189,248,0.13);color:#7dd3fc;text-decoration:none;font-weight:700;font-size:12px;margin-right:6px;}
+        .actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+        @media(max-width:800px){body{padding:18px}.filter{grid-template-columns:1fr;}}
+    </style>
+</head>
+<body class="app-main theme-{{ session.theme or 'dark' }}">
+{% include "_sidebar.html" %}
+<div class="container">
+    <h1><i class="fa-solid fa-folder-open"></i> Report History</h1>
+
+    <form class="filter" method="GET">
+        <input type="text" name="search" value="{{ search }}" placeholder="Search target or summary">
+        {% if is_admin %}
+        <input type="text" name="user" value="{{ user_filter }}" placeholder="Username">
+        {% endif %}
+        <select name="tool">
+            <option value="">All tools</option>
+            <option value="Log Analysis" {% if tool_filter == "Log Analysis" %}selected{% endif %}>Log Analysis</option>
+            <option value="Network Recon" {% if tool_filter == "Network Recon" %}selected{% endif %}>Network Recon</option>
+            <option value="Packet Analysis" {% if tool_filter == "Packet Analysis" %}selected{% endif %}>Packet Analysis</option>
+            <option value="Threat Intelligence" {% if tool_filter == "Threat Intelligence" %}selected{% endif %}>Threat Intelligence</option>
+        </select>
+        <button type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+    </form>
+
+    <div class="actions">
+        <a class="badge" href="/reports/compare"><i class="fa-solid fa-code-compare"></i> Compare Reports</a>
+        {% if session.is_admin or session.role in ["admin", "super_admin"] %}
+        <a class="badge" href="/admin/export/reports"><i class="fa-solid fa-file-csv"></i> Export CSV</a>
+        {% endif %}
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Tool</th>
+                <th>Target</th>
+                <th>Summary</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+            {% for report in reports %}
+            <tr>
+                <td>{{ report.id }}</td>
+                <td>{{ report.username }}</td>
+                <td>{{ report.tool }}</td>
+                <td>{{ report.target or "-" }}</td>
+                <td>{{ report.summary or "-" }}</td>
+                <td>{{ report.created_at }}</td>
+                <td>
+                    <a class="badge" href="/reports/{{ report.id }}">View</a>
+                    <a class="badge" href="/reports/{{ report.id }}/download-pdf">PDF</a>
+                    <a class="badge" href="/reports/compare?first={{ report.id }}">Compare</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7">No reports found.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+</body>
+</html>

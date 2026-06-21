@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CyberShield">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='pwa/icon.svg') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='pwa/maskable-icon.svg') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='app-shell.css') }}">
+    <title>Cyber Log Analysis Dashboard</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Poppins',sans-serif;
+        }
+
+        body{
+            background: linear-gradient(135deg,#0f172a,#111827,#1e293b);
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            padding:30px;
+            color:white;
+        }
+
+        .container{
+            width:100%;
+            max-width:1100px;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(12px);
+            border:1px solid rgba(255,255,255,0.1);
+            border-radius:20px;
+            padding:35px;
+            box-shadow:0 0 30px rgba(0,0,0,0.5);
+        }
+
+        .title{
+            text-align:center;
+            margin-bottom:30px;
+        }
+
+        .title h1{
+            font-size:32px;
+            font-weight:700;
+            color:#38bdf8;
+        }
+
+        .title p{
+            color:#cbd5e1;
+            margin-top:8px;
+            font-size:14px;
+        }
+
+       .upload-box{
+    border:2px dashed #38bdf8;
+    padding:50px 30px;
+    border-radius:20px;
+    text-align:center;
+    transition:0.3s;
+    background:rgba(255,255,255,0.03);
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:18px;
+}
+
+        .upload-box:hover{
+    background:rgba(56,189,248,0.08);
+}
+
+        .upload-box i{
+            font-size:55px;
+            color:#38bdf8;
+            margin-bottom:15px;
+        }
+
+        input[type="file"]{
+            margin-top:15px;
+            color:white;
+        }
+
+       .btn{
+    min-width:220px;
+    min-height:46px;
+    padding:12px 22px;
+    border:none;
+    border-radius:14px;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:700;
+    transition:0.3s;
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+}
+
+      .analyze-btn{
+    background:#38bdf8;
+    color:#0f172a;
+}
+.form-actions{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+.file-upload{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+input[type="file"]{
+    width:320px;
+    max-width:100%;
+    padding:12px;
+    border-radius:12px;
+    background:rgba(255,255,255,0.08);
+    color:white;
+    border:1px solid rgba(255,255,255,0.08);
+    cursor:pointer;
+}
+
+.analyze-btn:hover{
+    background:#0ea5e9;
+    transform:translateY(-3px);
+}
+
+        .download-btn{
+            background:#22c55e;
+            color:white;
+        }
+
+        .download-btn:hover{
+            background:#16a34a;
+        }
+
+        .results{
+            margin-top:35px;
+        }
+
+        .alert-banner{
+            display:flex;
+            align-items:center;
+            gap:14px;
+            margin-bottom:24px;
+            padding:16px 18px;
+            border-radius:12px;
+            background:rgba(239,68,68,0.14);
+            border:1px solid rgba(248,113,113,0.55);
+            color:#fee2e2;
+            box-shadow:0 0 22px rgba(239,68,68,0.18);
+        }
+
+        .alert-banner i{
+            color:#f87171;
+            font-size:24px;
+        }
+
+        .chart-panel{
+            margin-bottom:24px;
+            background:rgba(255,255,255,0.06);
+            padding:20px;
+            border-radius:15px;
+            border:1px solid rgba(255,255,255,0.08);
+        }
+
+        .chart-panel h3{
+            color:#38bdf8;
+            margin-bottom:15px;
+            font-size:18px;
+        }
+
+        .chart-wrap{
+            position:relative;
+            width:100%;
+            min-height:330px;
+        }
+
+        #bruteForceChart{
+            width:100%;
+            height:330px;
+            display:block;
+        }
+
+        .cards{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+            gap:20px;
+        }
+
+        .card{
+            background:rgba(255,255,255,0.06);
+            padding:20px;
+            border-radius:15px;
+            border:1px solid rgba(255,255,255,0.08);
+            transition:0.3s;
+        }
+
+        .card:hover{
+            transform:translateY(-5px);
+            box-shadow:0 0 20px rgba(56,189,248,0.2);
+        }
+
+        .card h3{
+            margin-bottom:15px;
+            color:#38bdf8;
+            font-size:18px;
+        }
+
+        .card ul{
+            list-style:none;
+        }
+
+        .card ul li{
+            padding:8px 0;
+            border-bottom:1px solid rgba(255,255,255,0.08);
+            font-size:14px;
+            color:#e2e8f0;
+        }
+
+        .download-actions{
+            margin-top:24px;
+            display:flex;
+            justify-content:center;
+        }
+
+        .back-link{
+            margin-top:25px;
+            text-align:center;
+        }
+
+        .back-link a{
+            color:#38bdf8;
+            text-decoration:none;
+            font-weight:500;
+        }
+
+        .back-link a:hover{
+            text-decoration:underline;
+        }
+
+        .no-result{
+            margin-top:25px;
+            text-align:center;
+            background:rgba(239,68,68,0.12);
+            border:1px solid rgba(239,68,68,0.28);
+            padding:16px;
+            border-radius:12px;
+            color:#fecaca;
+        }
+
+        @media(max-width:600px){
+            .container{
+                padding:20px;
+            }
+
+            .title h1{
+                font-size:24px;
+            }
+        }
+
+    </style>
+</head>
+<body class="app-main theme-{{ session.theme or 'dark' }}">
+{% include "_sidebar.html" %}
+
+<div class="container">
+
+    <div class="title">
+        <h1><i class="fa-solid fa-shield-halved"></i> Log Analysis Dashboard</h1>
+        <p>Upload and analyze cybersecurity log files instantly</p>
+    </div>
+
+    <!-- Upload Form -->
+    <form method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="upload-box">
+            <i class="fa-solid fa-file-shield"></i>
+
+            <h2>Upload Log File</h2>
+            <p>Select a .log or .txt file for analysis</p>
+
+            <input type="file" name="logfile" required>
+
+            <br>
+
+            <div class="form-actions">
+                <button type="submit" class="btn analyze-btn">
+                    <i class="fa-solid fa-magnifying-glass-chart"></i>
+                    Analyze Logs
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+    {% if result %}
+    <div class="results">
+
+        {% if result.alert %}
+        <div class="alert-banner" role="alert">
+            <i class="fa-solid fa-bell"></i>
+            <strong>{{ result.alert_message }}</strong>
+        </div>
+        {% endif %}
+
+        {% if result.brute_force %}
+        <div class="chart-panel">
+            <h3><i class="fa-solid fa-chart-column"></i> Brute Force Attempts by IP</h3>
+            <div class="chart-wrap">
+                <canvas id="bruteForceChart"></canvas>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="cards">
+
+            <!-- Suspicious IPs -->
+            <div class="card">
+                <h3><i class="fa-solid fa-triangle-exclamation"></i> Suspicious IPs</h3>
+
+                <ul>
+                    {% for ip in result.suspicious_ips %}
+                    <li>{{ ip }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Brute Force -->
+            <div class="card">
+                <h3><i class="fa-solid fa-user-lock"></i> Brute Force</h3>
+
+                <ul>
+                    {% for ip, count in result.brute_force.items() %}
+                    <li>{{ ip }} → {{ count }} Attempts</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Unauthorized -->
+            <div class="card">
+                <h3><i class="fa-solid fa-ban"></i> Unauthorized Access</h3>
+
+                <ul>
+                    {% for ip in result.unauthorized %}
+                    <li>{{ ip }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- Download Button -->
+        <div class="download-actions">
+            <a href="/download_log">
+                <button class="btn download-btn">
+                    <i class="fa-solid fa-download"></i>
+                    Download JSON Report
+                </button>
+            </a>
+        </div>
+
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="no-result">{{ error }}</div>
+    {% endif %}
+
+    <div class="back-link">
+        <a href="/">
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Home
+        </a>
+    </div>
+
+</div>
+
+{% if result %}
+<script>
+    const bruteForceData = {{ result.brute_force | tojson }};
+    const shouldAlert = {{ result.alert | tojson }};
+
+    function playAlertBeep() {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) {
+            return;
+        }
+
+        const audio = new AudioContext();
+        const oscillator = audio.createOscillator();
+        const gain = audio.createGain();
+
+        oscillator.type = "sine";
+        oscillator.frequency.value = 880;
+        gain.gain.setValueAtTime(0.001, audio.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.35, audio.currentTime + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + 0.45);
+
+        oscillator.connect(gain);
+        gain.connect(audio.destination);
+        oscillator.start();
+        oscillator.stop(audio.currentTime + 0.45);
+    }
+
+    function drawBruteForceChart() {
+        const canvas = document.getElementById("bruteForceChart");
+        if (!canvas) {
+            return;
+        }
+
+        const entries = Object.entries(bruteForceData).sort((a, b) => b[1] - a[1]);
+        const ctx = canvas.getContext("2d");
+        const ratio = window.devicePixelRatio || 1;
+        const width = canvas.clientWidth;
+        const height = canvas.clientHeight;
+
+        canvas.width = width * ratio;
+        canvas.height = height * ratio;
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        ctx.clearRect(0, 0, width, height);
+
+        if (!entries.length) {
+            return;
+        }
+
+        const padding = { top: 20, right: 24, bottom: 84, left: 54 };
+        const chartWidth = width - padding.left - padding.right;
+        const chartHeight = height - padding.top - padding.bottom;
+        const maxValue = Math.max(...entries.map(([, count]) => count));
+        const barGap = 12;
+        const barWidth = Math.max(18, (chartWidth - barGap * (entries.length - 1)) / entries.length);
+
+        ctx.strokeStyle = "rgba(226,232,240,0.22)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(padding.left, padding.top);
+        ctx.lineTo(padding.left, padding.top + chartHeight);
+        ctx.lineTo(width - padding.right, padding.top + chartHeight);
+        ctx.stroke();
+
+        ctx.fillStyle = "#cbd5e1";
+        ctx.font = "12px Poppins, sans-serif";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+
+        for (let tick = 0; tick <= 4; tick++) {
+            const value = Math.round((maxValue / 4) * tick);
+            const y = padding.top + chartHeight - (chartHeight * tick / 4);
+            ctx.fillText(value, padding.left - 10, y);
+            ctx.strokeStyle = "rgba(226,232,240,0.08)";
+            ctx.beginPath();
+            ctx.moveTo(padding.left, y);
+            ctx.lineTo(width - padding.right, y);
+            ctx.stroke();
+        }
+
+        entries.forEach(([ip, count], index) => {
+            const x = padding.left + index * (barWidth + barGap);
+            const barHeight = (count / maxValue) * chartHeight;
+            const y = padding.top + chartHeight - barHeight;
+
+            const gradient = ctx.createLinearGradient(0, y, 0, padding.top + chartHeight);
+            gradient.addColorStop(0, "#f87171");
+            gradient.addColorStop(1, "#38bdf8");
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(x, y, barWidth, barHeight);
+
+            ctx.fillStyle = "#e2e8f0";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "bottom";
+            ctx.font = "600 12px Poppins, sans-serif";
+            ctx.fillText(count, x + barWidth / 2, y - 6);
+
+            ctx.save();
+            ctx.translate(x + barWidth / 2, padding.top + chartHeight + 12);
+            ctx.rotate(-Math.PI / 4);
+            ctx.textAlign = "right";
+            ctx.textBaseline = "middle";
+            ctx.font = "11px Poppins, sans-serif";
+            ctx.fillStyle = "#cbd5e1";
+            ctx.fillText(ip, 0, 0);
+            ctx.restore();
+        });
+    }
+
+    drawBruteForceChart();
+    window.addEventListener("resize", drawBruteForceChart);
+
+    if (shouldAlert) {
+        setTimeout(playAlertBeep, 250);
+    }
+</script>
+{% endif %}
+
+<script src="{{ url_for('static', filename='pwa.js') }}"></script>
+</body>
+</html>

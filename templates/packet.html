@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CyberShield">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='pwa/icon.svg') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='pwa/maskable-icon.svg') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='app-shell.css') }}">
+    <title>Packet Inspection Dashboard</title>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+        font-family:'Poppins',sans-serif;
+    }
+
+    body{
+        min-height:100vh;
+        background:
+        linear-gradient(135deg,#0f172a,#111827,#1e293b);
+        color:white;
+        padding:30px;
+    }
+
+    .container{
+        width:95%;
+        max-width:1250px;
+        margin:auto;
+        background:rgba(255,255,255,0.05);
+        backdrop-filter:blur(12px);
+        border-radius:25px;
+        border:1px solid rgba(255,255,255,0.08);
+        padding:35px;
+        box-shadow:0 0 35px rgba(0,0,0,0.45);
+    }
+
+    /* TITLE */
+
+    .title{
+        text-align:center;
+        margin-bottom:30px;
+    }
+
+    .title h1{
+        font-size:36px;
+        color:#38bdf8;
+        margin-bottom:10px;
+    }
+
+    .title p{
+        color:#cbd5e1;
+        font-size:14px;
+    }
+
+    /* GRID */
+
+    .grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:25px;
+    }
+
+    /* BOX */
+
+    .upload-box{
+        background:rgba(255,255,255,0.04);
+        border:2px dashed #38bdf8;
+        border-radius:20px;
+        padding:35px;
+        text-align:center;
+    }
+
+    .upload-box form{
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+    }
+
+    .upload-box i{
+        font-size:55px;
+        color:#38bdf8;
+        margin-bottom:15px;
+    }
+
+    .upload-box h2{
+        margin-bottom:15px;
+    }
+
+    input{
+        width:100%;
+        max-width:420px;
+        padding:14px;
+        border:none;
+        border-radius:12px;
+        background:rgba(255,255,255,0.08);
+        color:white;
+        margin-top:15px;
+    }
+
+    input::placeholder{
+        color:#cbd5e1;
+    }
+
+    /* BUTTON */
+
+    .btn{
+        min-width:220px;
+        min-height:46px;
+        padding:12px 22px;
+        border:none;
+        border-radius:12px;
+        cursor:pointer;
+        font-weight:600;
+        transition:0.3s;
+        margin-top:18px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:10px;
+    }
+
+    .btn:hover{
+        transform:scale(1.03);
+    }
+
+    .analyze-btn{
+        background:#38bdf8;
+        color:#0f172a;
+    }
+
+    .analyze-btn:hover{
+        background:#0ea5e9;
+    }
+
+    .live-btn{
+        background:#22c55e;
+        color:white;
+    }
+
+    .live-btn:hover{
+        background:#16a34a;
+    }
+
+    .download-btn{
+        background:#f59e0b;
+        color:white;
+    }
+
+    .download-btn:hover{
+        background:#d97706;
+    }
+
+    /* SUMMARY */
+
+    .summary{
+        margin-top:35px;
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+        gap:20px;
+    }
+
+    .card{
+        background:rgba(255,255,255,0.05);
+        border:1px solid rgba(255,255,255,0.08);
+        border-radius:18px;
+        padding:25px;
+        text-align:center;
+        transition:0.3s;
+    }
+
+    .card:hover{
+        transform:translateY(-6px);
+        box-shadow:0 0 20px rgba(56,189,248,0.25);
+    }
+
+    .card i{
+        font-size:35px;
+        margin-bottom:12px;
+    }
+
+    .card h2{
+        font-size:28px;
+        margin-bottom:5px;
+    }
+
+    .card p{
+        color:#cbd5e1;
+        font-size:14px;
+    }
+
+    .danger{
+        color:#ef4444;
+    }
+
+    .safe{
+        color:#22c55e;
+    }
+
+    .warning{
+        color:#f59e0b;
+    }
+
+    /* TABLE */
+
+    .table-section{
+        margin-top:35px;
+    }
+
+    .table-section h3{
+        margin-bottom:15px;
+        color:#38bdf8;
+    }
+
+    table{
+        width:100%;
+        border-collapse:collapse;
+        background:rgba(255,255,255,0.04);
+        border-radius:15px;
+        overflow:hidden;
+    }
+
+    th{
+        background:#38bdf8;
+        color:#0f172a;
+        padding:14px;
+        text-align:left;
+    }
+
+    td{
+        padding:12px;
+        border-bottom:1px solid rgba(255,255,255,0.08);
+        color:#e2e8f0;
+        font-size:14px;
+    }
+
+    tr:hover{
+        background:rgba(255,255,255,0.05);
+    }
+
+    .attack{
+        color:#ef4444;
+        font-weight:600;
+    }
+
+    .normal{
+        color:#22c55e;
+        font-weight:600;
+    }
+
+    /* NO DATA */
+
+    .no-data{
+        margin-top:25px;
+        text-align:center;
+        padding:20px;
+        background:rgba(255,255,255,0.05);
+        border-radius:15px;
+        color:#ef4444;
+        font-weight:600;
+    }
+
+    /* ACTIONS */
+
+    .actions{
+        margin-top:25px;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+    }
+
+    .back-link{
+        color:#38bdf8;
+        text-decoration:none;
+        font-weight:600;
+    }
+
+    .back-link:hover{
+        text-decoration:underline;
+    }
+
+    @media(max-width:900px){
+
+        .grid{
+            grid-template-columns:1fr;
+        }
+
+        .btn{
+            width:100%;
+            max-width:420px;
+        }
+
+    }
+
+</style>
+</head>
+
+<body class="app-main theme-{{ session.theme or 'dark' }}">
+{% include "_sidebar.html" %}
+
+<div class="container">
+
+<!-- TITLE -->
+
+<div class="title">
+
+    <h1>
+        <i class="fa-solid fa-network-wired"></i>
+        Packet Inspection Dashboard
+    </h1>
+
+    <p>
+        Analyze PCAP files and monitor live network traffic
+    </p>
+
+</div>
+
+<!-- GRID -->
+
+<div class="grid">
+
+    <!-- PCAP ANALYSIS -->
+
+    <div class="upload-box">
+
+        <i class="fa-solid fa-file-shield"></i>
+
+        <h2>Upload PCAP File</h2>
+
+        <form method="POST"
+              enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <input type="file"
+                   name="pcapfile"
+                   accept=".pcap">
+
+            <button type="submit"
+                    class="btn analyze-btn">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+                Analyze PCAP
+
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- LIVE MONITOR -->
+
+    <div class="upload-box">
+
+        <i class="fa-solid fa-satellite-dish"></i>
+
+        <h2>Live Packet Monitoring</h2>
+
+        <form action="/live_packet"
+              method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <input type="text"
+                   name="ip1"
+                   placeholder="Enter Source IP"
+                   required>
+
+            <input type="text"
+                   name="ip2"
+                   placeholder="Enter Destination IP"
+                   required>
+
+            <input type="number"
+                   name="duration"
+                   min="5"
+                   max="120"
+                   value="20"
+                   placeholder="Capture Duration Seconds"
+                   required>
+
+            <button type="submit"
+                    class="btn live-btn">
+
+                <i class="fa-solid fa-network-wired"></i>
+                Start Monitoring
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% if results is not none %}
+
+    {% if data and data.error %}
+
+    <div class="no-data">
+
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        {{ data.error }}
+
+    </div>
+
+    {% endif %}
+
+    {% if results %}
+
+    <!-- SUMMARY -->
+
+    <div class="summary">
+
+        <div class="card">
+            <i class="fa-solid fa-database safe"></i>
+            <h2>{{ results|length }}</h2>
+            <p>Total Packets</p>
+        </div>
+
+        <div class="card">
+            <i class="fa-solid fa-bug danger"></i>
+            <h2>{{ data.attack_summary["SQL Injection"] }}</h2>
+            <p>SQL Injection</p>
+        </div>
+
+        <div class="card">
+            <i class="fa-solid fa-code danger"></i>
+            <h2>{{ data.attack_summary["XSS Attack"] }}</h2>
+            <p>XSS Attacks</p>
+        </div>
+
+        <div class="card">
+            <i class="fa-solid fa-terminal warning"></i>
+            <h2>{{ data.attack_summary["Command Injection"] }}</h2>
+            <p>Command Injection</p>
+        </div>
+
+        <div class="card">
+            <i class="fa-solid fa-circle-check safe"></i>
+            <h2>{{ data.attack_summary["Normal"] }}</h2>
+            <p>Normal Packets</p>
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+
+    <div class="table-section">
+
+        <h3>
+            <i class="fa-solid fa-diagram-project"></i>
+            Captured Packets
+        </h3>
+
+        <table>
+
+            <tr>
+                <th>Source</th>
+                <th>Destination</th>
+                <th>Protocol</th>
+                <th>Status</th>
+            </tr>
+
+            {% for pkt in results %}
+
+            <tr>
+
+                <td>{{ pkt.source }}</td>
+
+                <td>{{ pkt.destination }}</td>
+
+                <td>{{ pkt.protocol }}</td>
+
+                <td>
+
+                    {% if pkt.attack != "Normal" %}
+
+                        <span class="attack">
+                            {{ pkt.attack }}
+                        </span>
+
+                    {% else %}
+
+                        <span class="normal">
+                            Normal
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+    </div>
+
+    <!-- DOWNLOAD -->
+
+    <div class="actions">
+
+        <a href="/download_packet">
+
+            <button class="btn download-btn">
+
+                <i class="fa-solid fa-download"></i>
+                Download JSON
+
+            </button>
+
+        </a>
+
+    </div>
+
+    {% elif not data or not data.error %}
+
+    <div class="no-data">
+
+        <i class="fa-solid fa-circle-xmark"></i>
+        No packets found
+
+    </div>
+
+    {% endif %}
+
+{% endif %}
+
+{% if error %}
+<div class="no-data">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    {{ error }}
+</div>
+{% endif %}
+
+<!-- BACK -->
+
+<div class="actions">
+
+    <a href="/" class="back-link">
+
+        <i class="fa-solid fa-arrow-left"></i>
+        Back to Dashboard
+
+    </a>
+
+</div>
+</div>
+
+<script src="{{ url_for('static', filename='pwa.js') }}"></script>
+</body>
+</html>

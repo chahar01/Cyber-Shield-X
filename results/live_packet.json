@@ -1,0 +1,17 @@
+{
+    "total_packets": 0,
+    "attack_summary": {
+        "SQL Injection": 0,
+        "XSS Attack": 0,
+        "Command Injection": 0,
+        "Normal": 0
+    },
+    "packets": [],
+    "mode": "live",
+    "monitored_hosts": [
+        "127.0.0.1",
+        "8.8.8.8"
+    ],
+    "duration": 20,
+    "error": "Live monitoring failed: Sniffing and sending packets is not available at layer 2: winpcap is not installed. You may use conf.L3socket or conf.L3socket6 to access layer 3"
+}

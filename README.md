@@ -46,14 +46,7 @@ Cyber Shield X is a web-based cybersecurity monitoring platform developed to ana
 * Requests
 * BeautifulSoup
 
-## Installation
 
-```bash
-git clone https://github.com/chahar01/Cyber-Shield-X.git
-cd Cyber-Shield-X
-pip install -r requirements.txt
-python app.py
-```
 
 ## Project Structure
 
